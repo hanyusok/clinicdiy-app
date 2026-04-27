@@ -1,4 +1,5 @@
 import { login, signup } from './actions'
+import OAuthButtons from '@/components/OAuthButtons'
 
 export default async function LoginPage(props: { searchParams: Promise<{ message: string }> }) {
   const searchParams = await props.searchParams
@@ -58,6 +59,8 @@ export default async function LoginPage(props: { searchParams: Promise<{ message
             {searchParams.message}
           </p>
         )}
+
+        <OAuthButtons />
       </form>
     </div>
   )

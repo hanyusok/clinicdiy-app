@@ -1,7 +1,14 @@
 import Link from 'next/link'
-import { Hammer, UserCircle } from 'lucide-react'
+import { Hammer, UserCircle, LogOut } from 'lucide-react'
+import { createClient } from '@/utils/supabase/server'
+import { signout } from '@/app/login/actions'
 
-export default function Navbar() {
+export default async function Navbar() {
+  const supabase = await createClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  
+  console.log('Navbar getUser():', { hasUser: !!user, email: user?.email, error: error?.message })
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/80">
       <div className="flex h-14 items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -10,12 +17,31 @@ export default function Navbar() {
           <span className="font-bold text-xl tracking-tight">ClinicDIY</span>
         </Link>
         <div className="flex items-center gap-4">
-          <Link href="/login" className="text-sm font-medium hover:text-blue-600 transition-colors">
-            로그인
-          </Link>
-          <Link href="/profile" aria-label="Profile">
-            <UserCircle className="h-6 w-6 text-gray-600 hover:text-blue-600 dark:text-gray-400 transition-colors" />
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-gray-500 hidden sm:inline-block">
+                {user.email?.split('@')[0]}님 환영합니다
+              </span>
+              <form action={signout}>
+                <button type="submit" className="text-sm font-medium text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500 transition-colors flex items-center gap-1">
+                  <LogOut className="w-4 h-4" />
+                  로그아웃
+                </button>
+              </form>
+              <Link href="/profile" aria-label="Profile">
+                <UserCircle className="h-6 w-6 text-gray-600 hover:text-blue-600 dark:text-gray-400 transition-colors" />
+              </Link>
+            </div>
+          ) : (
+            <>
+              <Link href="/login" className="text-sm font-medium hover:text-blue-600 transition-colors">
+                로그인
+              </Link>
+              <Link href="/login" aria-label="Profile">
+                <UserCircle className="h-6 w-6 text-gray-600 hover:text-blue-600 dark:text-gray-400 transition-colors" />
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
