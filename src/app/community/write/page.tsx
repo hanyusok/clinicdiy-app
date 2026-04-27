@@ -1,14 +1,46 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
-import { ArrowLeft, Image as ImageIcon, Loader2 } from 'lucide-react'
+import { ArrowLeft, Image as ImageIcon, Loader2, X } from 'lucide-react'
 
 export default function WritePage() {
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
+  const [files, setFiles] = useState<File[]>([])
+  const [previews, setPreviews] = useState<string[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return
+
+    const selectedFiles = Array.from(e.target.files)
+    if (files.length + selectedFiles.length > 5) {
+      alert('사진은 최대 5장까지 첨부할 수 있습니다.')
+      return
+    }
+
+    setFiles(prev => [...prev, ...selectedFiles])
+    
+    // Generate previews
+    const newPreviews = selectedFiles.map(file => URL.createObjectURL(file))
+    setPreviews(prev => [...prev, ...newPreviews])
+    
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  const removeFile = (index: number) => {
+    setFiles(prev => prev.filter((_, i) => i !== index))
+    setPreviews(prev => {
+      URL.revokeObjectURL(prev[index])
+      return prev.filter((_, i) => i !== index)
+    })
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -27,13 +59,39 @@ export default function WritePage() {
         return
       }
 
+      // 1. Upload images first
+      const uploadedUrls: string[] = []
+      
+      for (const file of files) {
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`
+        const filePath = `${user.id}/${fileName}`
+
+        const { error: uploadError } = await supabase.storage
+          .from('post-images')
+          .upload(filePath, file)
+
+        if (uploadError) {
+          console.error('Upload Error:', uploadError)
+          throw new Error('이미지 업로드에 실패했습니다.')
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('post-images')
+          .getPublicUrl(filePath)
+
+        uploadedUrls.push(publicUrl)
+      }
+
+      // 2. Insert post with image_urls
       const { data, error } = await supabase
         .from('posts')
         .insert({
           title,
           content,
           category,
-          user_id: user.id
+          user_id: user.id,
+          image_urls: uploadedUrls
         })
         .select()
         .single()
@@ -42,9 +100,9 @@ export default function WritePage() {
 
       router.push(`/community/${data.id}`)
       router.refresh()
-    } catch (error) {
+    } catch (error: any) {
       console.error(error)
-      alert('게시글 등록 중 오류가 발생했습니다.')
+      alert(error.message || '게시글 등록 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
     }
@@ -98,13 +156,49 @@ export default function WritePage() {
             />
           </div>
 
-          {/* Image Upload Placeholder */}
-          <div className="flex items-center gap-4">
-            <button type="button" className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20">
-              <ImageIcon className="w-5 h-5" />
-              사진 첨부
-            </button>
-            <span className="text-xs text-gray-400">최대 5장 (기능 준비중)</span>
+          {/* Image Upload Area */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <input 
+                type="file" 
+                multiple 
+                accept="image/*"
+                className="hidden" 
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+              />
+              <button 
+                type="button" 
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
+              >
+                <ImageIcon className="w-5 h-5" />
+                사진 첨부
+              </button>
+              <span className="text-xs text-gray-400">최대 5장 ({files.length}/5)</span>
+            </div>
+
+            {/* Previews */}
+            {previews.length > 0 && (
+              <div className="flex flex-wrap gap-4">
+                {previews.map((preview, index) => (
+                  <div key={index} className="relative group w-24 h-24 sm:w-32 sm:h-32">
+                    <img 
+                      src={preview} 
+                      alt={`Preview ${index + 1}`} 
+                      className="w-full h-full object-cover rounded-xl border border-gray-200 dark:border-gray-800"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeFile(index)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="pt-4 flex gap-4">

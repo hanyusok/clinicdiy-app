@@ -37,9 +37,11 @@ for (let i = 1; i <= 30; i++) {
   const title = postTitles[i - 1] || "Post Title " + i;
   const content = "이것은 " + title + "에 대한 상세 내용입니다. 셀프 인테리어를 하면서 겪은 다양한 경험과 노하우를 공유합니다. " + i + "번째 게시물입니다.";
   
+  const imageUrls = Array.from({length: 10}, (_, imgIdx) => "'https://picsum.photos/seed/" + i + "_" + (imgIdx + 1) + "/400/300'").join(', ');
+  
   posts.push(
-    "INSERT INTO public.posts (user_id, category, title, content, likes_count, views_count) " +
-    "VALUES ('" + userId + "', '" + category + "', '" + title + "', '" + content + "', " + Math.floor(Math.random() * 50) + ", " + Math.floor(Math.random() * 200) + ");"
+    "INSERT INTO public.posts (user_id, category, title, content, likes_count, views_count, image_urls) " +
+    "VALUES ('" + userId + "', '" + category + "', '" + title + "', '" + content + "', " + Math.floor(Math.random() * 50) + ", " + Math.floor(Math.random() * 200) + ", ARRAY[" + imageUrls + "]);"
   );
 }
 
