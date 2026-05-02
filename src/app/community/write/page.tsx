@@ -129,9 +129,11 @@ export default function WritePage() {
               className="w-full rounded-xl px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm appearance-none"
             >
               <option value="knowhow">노하우/팁</option>
+              <option value="legal">법규 가이드</option>
+              <option value="space_opt">공간 최적화</option>
               <option value="tools">도구/제품</option>
               <option value="templates">템플릿</option>
-              <option value="qna">질문</option>
+              <option value="qna">질문/답변</option>
             </select>
           </div>
 

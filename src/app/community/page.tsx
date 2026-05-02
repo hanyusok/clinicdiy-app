@@ -1,8 +1,18 @@
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
-import { Plus, MessageSquare, ThumbsUp, Eye, Search } from 'lucide-react'
+import { Plus, MessageSquare, ThumbsUp, Eye } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
+
+const categories = [
+  { id: 'all', name: '전체', color: 'gray' },
+  { id: 'knowhow', name: '노하우/팁', color: 'blue' },
+  { id: 'legal', name: '법규 가이드', color: 'red' },
+  { id: 'space_opt', name: '공간 최적화', color: 'emerald' },
+  { id: 'tools', name: '도구/제품', color: 'orange' },
+  { id: 'templates', name: '템플릿', color: 'purple' },
+  { id: 'qna', name: '질문/답변', color: 'sky' },
+]
 
 export default async function CommunityPage(props: { searchParams: Promise<{ category?: string }> }) {
   const searchParams = await props.searchParams
@@ -20,13 +30,7 @@ export default async function CommunityPage(props: { searchParams: Promise<{ cat
 
   const { data: posts } = await query
 
-  const categories = [
-    { id: 'all', name: '전체' },
-    { id: 'knowhow', name: '노하우/팁' },
-    { id: 'tools', name: '도구/제품' },
-    { id: 'templates', name: '템플릿' },
-    { id: 'qna', name: '질문' },
-  ]
+  const categoryInfo = categories.find(c => c.id === category) || categories[0]
 
   return (
     <div className="flex-1 w-full max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -44,7 +48,7 @@ export default async function CommunityPage(props: { searchParams: Promise<{ cat
         </Link>
       </div>
 
-      {/* Categories / Tabs */}
+      {/* Categories */}
       <div className="flex overflow-x-auto hide-scrollbar gap-2 mb-8 pb-2">
         {categories.map((c) => (
           <Link
@@ -61,10 +65,23 @@ export default async function CommunityPage(props: { searchParams: Promise<{ cat
         ))}
       </div>
 
-      {/* Posts Grid/List */}
+      {/* Category Description */}
+      {category === 'legal' && (
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-2xl text-sm text-red-700 dark:text-red-300">
+          📋 <strong>법규 가이드</strong> — 소방시설법, 장애인 편의시설, 의료법상 시설 규격에 대한 정보를 공유합니다.
+        </div>
+      )}
+      {category === 'space_opt' && (
+        <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 rounded-2xl text-sm text-emerald-700 dark:text-emerald-300">
+          🏥 <strong>공간 최적화</strong> — 환자/의료진 동선 분리, X-ray실 차폐, 진료실 방음 등 공간 설계 노하우를 나눕니다.
+        </div>
+      )}
+
+      {/* Posts */}
       <div className="grid gap-4">
         {!posts || posts.length === 0 ? (
           <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800">
+            <MessageSquare className="w-12 h-12 mx-auto text-gray-300 mb-4" />
             <p className="text-gray-500 dark:text-gray-400">아직 등록된 게시글이 없습니다.</p>
           </div>
         ) : (
@@ -89,29 +106,20 @@ export default async function CommunityPage(props: { searchParams: Promise<{ cat
                 <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-4">
                   {post.content}
                 </p>
-                
                 <div className="flex items-center gap-4 text-xs text-gray-500">
                   <span className="flex items-center gap-1 font-medium text-gray-700 dark:text-gray-300">
-                    <div className="w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                      {/* Avatar placeholder */}
-                    </div>
                     {post.profiles?.username || '익명'}
                   </span>
                   <span className="flex items-center gap-1 ml-auto">
                     <ThumbsUp className="w-3.5 h-3.5" /> {post.likes_count}
                   </span>
                   <span className="flex items-center gap-1">
-                    <MessageSquare className="w-3.5 h-3.5" /> 0
-                  </span>
-                  <span className="flex items-center gap-1">
                     <Eye className="w-3.5 h-3.5" /> {post.views_count}
                   </span>
                 </div>
               </div>
-              
-              {/* Optional Thumbnail Image */}
               {post.image_urls && post.image_urls.length > 0 && (
-                <div className="w-full sm:w-32 h-32 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden shrink-0 mt-4 sm:mt-0">
+                <div className="w-full sm:w-32 h-32 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden shrink-0">
                   <img src={post.image_urls[0]} alt={post.title} className="w-full h-full object-cover" />
                 </div>
               )}
