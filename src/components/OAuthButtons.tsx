@@ -13,6 +13,11 @@ export default function OAuthButtons() {
       
       if (provider === 'kakao') {
         const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID
+        if (!clientId) {
+          alert('카카오 로그인 설정이 누락되었습니다. 관리자에게 문의하세요. (Kakao Client ID missing)')
+          setLoadingProvider(null)
+          return
+        }
         const redirectUri = `${window.location.origin}/auth/kakao/callback`
         const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid profile_nickname profile_image`
         window.location.href = kakaoAuthUrl
