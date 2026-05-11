@@ -51,14 +51,14 @@ export default async function Home() {
         <section className="mb-14">
           <div className="flex flex-wrap md:flex-nowrap items-start justify-start md:justify-between gap-4 md:gap-2 overflow-x-auto no-scrollbar pb-4 md:pb-0">
             {[
-              { name: '쇼핑하기', icon: ShoppingBag, color: 'text-purple-500', bg: 'bg-purple-100 dark:bg-purple-900/30', href: '/market' },
+              { name: '스토어', icon: ShoppingBag, color: 'text-purple-500', bg: 'bg-purple-100 dark:bg-purple-900/30', href: '/market' },
               { name: '포트폴리오', icon: Images, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30', href: '/portfolio' },
-              { name: '커뮤니티', icon: MessageSquare, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30', href: '/community' },
+              { name: '커뮤니티', icon: MessageSquare, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30', href: '/' },
               { name: '개원도구', icon: Hammer, color: 'text-orange-500', bg: 'bg-orange-100 dark:bg-orange-900/30', href: '/tools' },
-              { name: '법규가이드', icon: ClipboardCheck, color: 'text-teal-500', bg: 'bg-teal-100 dark:bg-teal-900/30', href: '/community?category=legal' },
+              { name: '법규/행정', icon: ClipboardCheck, color: 'text-teal-500', bg: 'bg-teal-100 dark:bg-teal-900/30', href: '/legal' },
               { name: '전문가찾기', icon: UserCircle, color: 'text-indigo-500', bg: 'bg-indigo-100 dark:bg-indigo-900/30', href: '/experts' },
-              { name: '공간별팁', icon: Grid, color: 'text-pink-500', bg: 'bg-pink-100 dark:bg-pink-900/30', href: '/space' },
-              { name: '인기노하우', icon: TrendingUp, color: 'text-red-500', bg: 'bg-red-100 dark:bg-red-900/30', href: '/popular' },
+              { name: '공간별 팁', icon: Grid, color: 'text-pink-500', bg: 'bg-pink-100 dark:bg-pink-900/30', href: '/space' },
+              { name: '인기', icon: TrendingUp, color: 'text-red-500', bg: 'bg-red-100 dark:bg-red-900/30', href: '/popular' },
               { name: '폐업정리', icon: Trash2, color: 'text-gray-500', bg: 'bg-gray-100 dark:bg-gray-800', href: '/closing' },
             ].map((item, idx) => (
               <Link key={idx} href={item.href} className="flex flex-col items-center gap-2 group w-[72px] md:w-auto shrink-0">

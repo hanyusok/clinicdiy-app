@@ -1,26 +1,14 @@
 import Link from 'next/link'
-import { Hammer, UserCircle, LogOut, Search, ShoppingCart } from 'lucide-react'
+import { UserCircle, LogOut, Search, ShoppingCart } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
 import { signout } from '@/app/login/actions'
-import NavLink from './NavLink'
+import SubNavbar from './SubNavbar'
 
 const mainLinks = [
-  { name: '커뮤니티', href: '/community' },
-  { name: '마켓', href: '/market' },
+  { name: '커뮤니티', href: '/' },
+  { name: '스토어', href: '/market' },
   { name: '포트폴리오', href: '/portfolio' },
-  { name: '개원도구', href: '/tools' },
-]
-
-const subLinks = [
-  { name: '홈', href: '/' },
-  { name: '추천', href: '/recommend' },
-  { name: '인기', href: '/popular' },
-  { name: '개원준비', href: '/preparation' },
-  { name: '공간별', href: '/space' },
-  { name: '법규/행정', href: '/legal' },
-  { name: 'DIY노하우', href: '/diy' },
-  { name: '전문가찾기', href: '/experts' },
-  { name: '폐업정리', href: '/closing' },
+  { name: '전문가/도구', href: '/experts' },
 ]
 
 export default async function Navbar() {
@@ -34,7 +22,6 @@ export default async function Navbar() {
         <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2">
-              <Hammer className="h-7 w-7 text-blue-500" />
               <span className="font-extrabold text-2xl tracking-tight">ClinicDIY</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6 ml-2">
@@ -98,15 +85,7 @@ export default async function Navbar() {
         </div>
 
         {/* Bottom Row (Sub Navigation) */}
-        <div className="flex items-center h-12 px-4 sm:px-6 lg:px-8 overflow-x-auto no-scrollbar">
-          <nav className="flex items-center gap-6">
-            {subLinks.map((link) => (
-              <NavLink key={link.href} href={link.href}>
-                {link.name}
-              </NavLink>
-            ))}
-          </nav>
-        </div>
+        <SubNavbar />
       </div>
     </header>
   )
